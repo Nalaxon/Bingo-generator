@@ -11,14 +11,16 @@ Usage:
 ------
 
 ```shell
-bingo-generator.py  [file of terms] [output file] [# of cards] [# of dimentions]
+bingo-generator.py --wordlist="file of terms" [--output] [--card_size] [--card_count] [--branding] [--image_directory] [--moderator_cards]
 ```
 
-Example:
+Example 1:
 --------
+One card with size 3x3 without branding, stored in bingo-output.html.
 
 ```shell
-python bingo-generator.py sample-data.txt bingo.html 10 5
+python bingo-generator.py --wordlist=sample-data.txt
 ```
+
 
 
