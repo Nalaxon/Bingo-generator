@@ -5,14 +5,14 @@ import random, sys
 
 # Check arguments which contain all
 if len(sys.argv) != 5:
-    print "Command: " + sys.argv[0], " [file of datas] [output file] [# of cards] [# of dimensions]"
-    print "Sample: " + sys.argv[0] + " bingo.txt bingo.html 10 5"
+    print("Command: " + sys.argv[0] + " [file of datas] [output file] [# of cards] [# of dimensions]")
+    print("Sample: " + sys.argv[0] + " bingo.txt bingo.html 10 5")
     sys.exit(1)
 
 # read in the bingo datas
 file_input = open(sys.argv[1], 'r')
 datas = [line.strip() for line in file_input.readlines()]
-datas = filter(lambda x: x != "", datas)
+datas = list(filter(lambda x: x != "", datas))
 file_input.close()
 
 # Set sys.argv[4] to dimention's table
@@ -24,8 +24,8 @@ num_lines = sum(1 for line in file_input)
 file_input.close()
 
 # Check if data less then pow(dimension,2) -> exit
-if (pow(dim,2) > num_lines):
-    print "Your input is less than dimensions, please try again"
+if (pow(dim,2) > len(datas)):
+    print("Your input is less than dimensions, please try again")
     sys.exit(1)
 
 # HTML5 Code @ Header File
