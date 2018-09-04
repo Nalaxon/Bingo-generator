@@ -2,26 +2,28 @@
 #-*-coding: utf-8 -*-
 
 import random, sys
+import argparse
 
-# Check arguments which contain all
-if len(sys.argv) != 5:
-    print("Command: " + sys.argv[0] + " [file of datas] [output file] [# of cards] [# of dimensions]")
-    print("Sample: " + sys.argv[0] + " bingo.txt bingo.html 10 5")
-    sys.exit(1)
+# set up argparser
+aparser = argparse.ArgumentParser(description="Create bingo sheets")
+aparser.add_argument("--wordlist", help="File includes words for bingo, one word per line.", required=True, type=argparse.FileType('r'))
+aparser.add_argument("--output", help="Filename for the resulting html outputfile.", default="bingo-output.html", type=argparse.FileType('w'))
+aparser.add_argument("--card_size", help="Size of card, should be an odd number.", type=int, default=3)
+aparser.add_argument("--card_count", help="Amount of card that should be created.", type=int, default=1)
+aparser.add_argument("--branding", help="Use branding, text can assigned here.", type=str)
+aparser.add_argument("--image_directory", help="Directory which includes images, images have to have the same name as the words (jpg)", type=str)
+aparser.add_argument("--moderator_cards", help="Also generate moderator cards", action='store_true')
+
+args = aparser.parse_args(sys.argv[1:])
 
 # read in the bingo datas
-file_input = open(sys.argv[1], 'r')
+file_input = args.wordlist
 datas = [line.strip() for line in file_input.readlines()]
 datas = list(filter(lambda x: x != "", datas))
 file_input.close()
 
 # Set sys.argv[4] to dimention's table
-dim =  int(float(sys.argv[4]))
-
-# read number of line for check the bingo datas
-file_input = open(sys.argv[1], 'r')
-num_lines = sum(1 for line in file_input)
-file_input.close()
+dim =  int(float(args.card_size))
 
 # Check if data less then pow(dimension,2) -> exit
 if (pow(dim,2) > len(datas)):
@@ -44,9 +46,14 @@ Header = ("<!DOCTYPE HTML>\n"
 
 # Generate an HTML table implementation of the bingo card for datas
 def getBingoTable(datas, pagebreak = True):
-    mid_dim = (dim*dim)/2
-    final_dim = (dim*dim)-1
-    ts = datas[:mid_dim] + ["<p style=\"color:white;\">Bingo!!</p>"] + datas[mid_dim:final_dim]
+    mid_dim = int((dim*dim)/2)
+    final_dim = (dim*dim)
+    ts = datas[:mid_dim]
+    if args.branding:
+        ts = ts + ["<p style=\"color:white;\">" + args.branding + "</p>"] + datas[mid_dim:final_dim-1]
+    else:
+        ts = ts + datas[mid_dim:final_dim]
+
     if pagebreak:
         tmp = "<center><img src=\"logo-bingo.png\" width=\"520\" height=\"130.4\" /></center>\n"
         tmp += "<table class=\"newtable\">\n"
@@ -56,7 +63,7 @@ def getBingoTable(datas, pagebreak = True):
     for i, data in enumerate(ts):
         if i % dim == 0:
             tmp += "\t<tr>\n"
-        if i == (mid_dim):
+        if (i == (mid_dim)) and args.branding:
             tmp += "\t\t<td style=\"background-color:black;\">" + data + "</td>\n"
         else:
             tmp += "\t\t<td>" + data + "</td>\n"
@@ -67,9 +74,9 @@ def getBingoTable(datas, pagebreak = True):
 
 
 # Write an output as HTML file
-file_output = open(sys.argv[2], 'w')
+file_output = args.output
 file_output.write(Header)
-cards = int(sys.argv[3])
+cards = int(args.card_count)
 for i in range(cards):
     random.shuffle(datas)
     if i != cards - 1:
